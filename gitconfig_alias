@@ -1,0 +1,93 @@
+[alias]
+	# Explore your history, the commits and the code
+	l = "!git lds"
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --numstat
+	lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
+	lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short1
+	ld = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+	le = log --oneline --decorate
+
+	# Show the history of a file, with diffs
+	filelog = log -u
+	fl = "!git filelog"
+
+	# Log commands to inspect (recent) history
+	dl = "!git ll -1"
+	dlc = diff --cached HEAD^
+	dr  = "!f() { git diff "$1"^.."$1"; }; f"
+	lc  = "!f() { git ll "$1"^.."$1"; }; f"
+	diffr  = "!f() { git diff "$1"^.."$1"; }; f"
+
+	# Finding files and content inside files (grep)
+	f = "!git ls-files | grep -i"
+	grep = grep -Ii
+	gr = grep -Ii
+	gra = "!f() { A=$(pwd) && TOPLEVEL=$(git rev-parse --show-toplevel) && cd $TOPLEVEL && git grep --full-name -In $1 | xargs -I{} echo $TOPLEVEL/{} && cd $A; }; f"
+
+	# Going meta: List all your Aliases (la)
+	la = "!git config -l | grep alias | cut -c 7-"
+
+	# Rename [branch] to done-[branch]
+	done = "!f() { git branch | grep "$1" | cut -c 3- | grep -v done | xargs -I{} git branch -m {} done-{}; }; f"
+
+	# Assume aliases
+	assume = update-index --assume-unchanged
+	unassume = update-index --no-assume-unchanged
+	assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+	unassumeall = "!git assumed | xargs git update-index --no-assume-unchanged"
+	assumeall = "!git st -s | awk {'print $2'} | xargs git assume"
+
+	# Tag aliases
+	lasttag = describe --tags --abbrev=0
+	lt = describe --tags --abbrev=0
+
+	# Merge aliases
+	ours = "!f() { git co --ours $@ && git add $@; }; f"
+	theirs = "!f() { git co --theirs $@ && git add $@; }; f"
+
+	# Bonus: Basic Shortcuts
+	a = add
+	ap = add -p
+	cp = cherry-pick
+	st = status -s
+	s = "!git st"
+	cl = clone
+	ci = commit
+	c = commit --verbose
+	ca = commit -a --verbose
+	cm = commit -m
+	cam = commit -a -m
+	co = checkout
+	cob = checkout -b
+	m = commit --amend --verbose
+	br = branch
+	d = diff
+	diff = diff --word-diff
+	dc = diff --cached
+	ds = diff --stat
+
+	# Reset Commands
+	r = reset
+	r1 = reset HEAD^
+	r2 = reset HEAD^^
+	rh = reset --hard
+	rh1 = reset HEAD^ --hard
+	rh2 = reset HEAD^^ --hard
+
+	# Git-svn shortcuts
+	svnr = svn rebase
+	svnd = svn dcommit
+	svnl = svn log --oneline --show-commit
+
+	# Stash operations
+	sl = stash list
+	sa = stash apply
+	ss = stash save
+
+	# List branches sorted by last modified
+	b = "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'"
+	bu = "!git fetch -p && for branch in `git branch --merged | grep -v master | grep -v release/ | grep -v '^*'`; do git branch -d $branch; don"
+	buf = "!git fetch -p && for branch in `git branch -vv | grep ': gone]' | awk '{print $1}'`; do git branch -D $branch; done"
+
+	# Update Repository
+	pl = "!git fetch -p & git pull"
