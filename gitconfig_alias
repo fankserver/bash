@@ -91,4 +91,4 @@
 	buf = "!git fetch -p && for branch in `git branch -vv | grep ': gone]' | awk '{print $1}'`; do git branch -D $branch; done"
 
 	# Update Repository
-	pl = "!git fetch -p & git pull"
+	pl = "!git fetch -p && git pull"
