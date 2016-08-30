@@ -4,9 +4,9 @@
 	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --numstat
 	lnc = log --pretty=format:"%h\\ %s\\ [%cn]"
 	lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
-
 	ld = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
 	le = log --oneline --decorate
+	lg = "!f() { git log -G$1; }; f"
 
 	# Show the history of a file, with diffs
 	filelog = log -u
@@ -87,7 +87,9 @@
 
 	# List branches sorted by last modified
 	b = "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'"
+	# Remove all local branches which are merged
 	bu = "!git fetch -p && for branch in `git branch --merged | grep -v master | grep -v release/ | grep -v '^*'`; do git branch -d $branch; don"
+	# Remove all local branches without upstream
 	buf = "!git fetch -p && for branch in `git branch -vv | grep ': gone]' | awk '{print $1}'`; do git branch -D $branch; done"
 
 	# Update Repository
