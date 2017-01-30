@@ -66,6 +66,7 @@
 	diff = diff --word-diff
 	dc = diff --cached
 	ds = diff --stat
+	p = push
 
 	# Reset Commands
 	r = reset
