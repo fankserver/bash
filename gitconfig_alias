@@ -60,13 +60,19 @@
 	cam = commit -a -m
 	co = checkout
 	cob = checkout -b
+	sw = switch
+	swc = switch -c
+	rs = restore
 	m = commit --amend --verbose
 	br = branch
+	rb = rebase -i
+	mt = mergetool
 	d = diff
 	diff = diff --word-diff
 	dc = diff --cached
 	ds = diff --stat
 	p = push
+	pf = push --force-with-lease
 
 	# Reset Commands
 	r = reset
