@@ -143,28 +143,33 @@
 			done; \
 		fi; \
 	}; f"
-	# Remove all local branches without upstream (with worktree support and confirmation)
+	# Remove all local branches without upstream or with gone upstream (with worktree support and confirmation)
 	buf = "!f() { \
 		git fetch -p; \
+		DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d'/' -f4 2>/dev/null || echo 'main'); \
+		CURRENT=$(git branch --show-current); \
 		WORKTREE_BRANCHES=$(git worktree list --porcelain 2>/dev/null | awk '/^branch / {print $2}' | sed 's|^refs/heads/||' | sort -u || true); \
 		GONE=$(git branch -vv | grep ': gone]' | awk '{print $1}'); \
+		NO_UPSTREAM=$(git branch -vv | grep -v ': ' | sed 's/^[* ] //' | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v '^release/'); \
+		TO_DELETE=$(printf '%s\\n%s\\n' \"$GONE\" \"$NO_UPSTREAM\" | grep -v '^$' | sort -u); \
 		if [ -n \"$WORKTREE_BRANCHES\" ]; then \
-			GONE=$(echo \"$GONE\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
+			TO_DELETE=$(echo \"$TO_DELETE\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
 		fi; \
-		if [ -z \"$GONE\" ]; then \
-			echo 'No branches with gone upstream to delete'; \
+		if [ -z \"$TO_DELETE\" ]; then \
+			echo 'No branches without upstream or with gone upstream to delete'; \
 			return 0; \
 		fi; \
-		echo 'Branches with gone upstream to DELETE (force):'; \
-		echo \"$GONE\" | while read branch; do \
+		echo 'Branches without upstream or with gone upstream to DELETE (force):'; \
+		echo \"$TO_DELETE\" | while read branch; do \
 			LAST_COMMIT=$(git log -1 --format='%cr by %an' \"$branch\" 2>/dev/null || echo 'unknown'); \
-			echo \"  $branch ($LAST_COMMIT)\"; \
+			UPSTREAM_STATUS=$(git branch -vv | grep \"^[* ] $branch \" | grep -q ': gone]' && echo 'gone upstream' || echo 'never pushed'); \
+			echo \"  $branch ($LAST_COMMIT) [$UPSTREAM_STATUS]\"; \
 		done; \
 		echo; \
 		read -p 'FORCE DELETE these branches? [y/N] ' -n 1 -r; \
 		echo; \
 		if [[ $REPLY =~ ^[Yy]$ ]]; then \
-			echo \"$GONE\" | xargs -r git branch -D; \
+			echo \"$TO_DELETE\" | xargs -r git branch -D; \
 			echo 'Done.'; \
 		else \
 			echo 'Cancelled.'; \
@@ -173,18 +178,23 @@
 	# Dry-run version of buf (just show what would be deleted)
 	bufd = "!f() { \
 		git fetch -p; \
+		DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d'/' -f4 2>/dev/null || echo 'main'); \
+		CURRENT=$(git branch --show-current); \
 		WORKTREE_BRANCHES=$(git worktree list --porcelain 2>/dev/null | awk '/^branch / {print $2}' | sed 's|^refs/heads/||' | sort -u || true); \
 		GONE=$(git branch -vv | grep ': gone]' | awk '{print $1}'); \
+		NO_UPSTREAM=$(git branch -vv | grep -v ': ' | sed 's/^[* ] //' | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v '^release/'); \
+		TO_DELETE=$(printf '%s\\n%s\\n' \"$GONE\" \"$NO_UPSTREAM\" | grep -v '^$' | sort -u); \
 		if [ -n \"$WORKTREE_BRANCHES\" ]; then \
-			GONE=$(echo \"$GONE\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
+			TO_DELETE=$(echo \"$TO_DELETE\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
 		fi; \
-		if [ -z \"$GONE\" ]; then \
-			echo 'No branches with gone upstream to delete'; \
+		if [ -z \"$TO_DELETE\" ]; then \
+			echo 'No branches without upstream or with gone upstream to delete'; \
 		else \
-			echo 'Branches with gone upstream that would be FORCE DELETED:'; \
-			echo \"$GONE\" | while read branch; do \
+			echo 'Branches without upstream or with gone upstream that would be FORCE DELETED:'; \
+			echo \"$TO_DELETE\" | while read branch; do \
 				LAST_COMMIT=$(git log -1 --format='%cr by %an' \"$branch\" 2>/dev/null || echo 'unknown'); \
-				echo \"  $branch ($LAST_COMMIT)\"; \
+				UPSTREAM_STATUS=$(git branch -vv | grep \"^[* ] $branch \" | grep -q ': gone]' && echo 'gone upstream' || echo 'never pushed'); \
+				echo \"  $branch ($LAST_COMMIT) [$UPSTREAM_STATUS]\"; \
 			done; \
 		fi; \
 	}; f"
