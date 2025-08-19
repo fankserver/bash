@@ -100,7 +100,7 @@
 		DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d\"/\" -f4 2>/dev/null || echo \"main\"); \
 		CURRENT=$(git branch --show-current); \
 		WORKTREE_BRANCHES=$(git worktree list --porcelain 2>/dev/null | awk \"/^branch / {print \\$2}\" | sed \"s|^refs/heads/||\" | sort -u || true); \
-		MERGED=$(git branch --merged | sed \"s/^[\\* ] //\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
+		MERGED=$(git branch --merged | sed \"s/^[\\*+ ] //\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
 		if [ -n \"$WORKTREE_BRANCHES\" ]; then \
 			MERGED=$(echo \"$MERGED\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
 		fi; \
@@ -135,7 +135,7 @@
 		DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d\"/\" -f4 2>/dev/null || echo \"main\"); \
 		CURRENT=$(git branch --show-current); \
 		WORKTREE_BRANCHES=$(git worktree list --porcelain 2>/dev/null | awk \"/^branch / {print \\$2}\" | sed \"s|^refs/heads/||\" | sort -u || true); \
-		MERGED=$(git branch --merged | sed \"s/^[\\* ] //\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
+		MERGED=$(git branch --merged | sed \"s/^[\\*+ ] //\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
 		if [ -n \"$WORKTREE_BRANCHES\" ]; then \
 			MERGED=$(echo \"$MERGED\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
 		fi; \
@@ -157,8 +157,8 @@
 		DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d\"/\" -f4 2>/dev/null || echo \"main\"); \
 		CURRENT=$(git branch --show-current); \
 		WORKTREE_BRANCHES=$(git worktree list --porcelain 2>/dev/null | awk \"/^branch / {print \\$2}\" | sed \"s|^refs/heads/||\" | sort -u || true); \
-		GONE=$(git branch -vv | grep \": gone]\" | awk \"{print \\$1}\"); \
-		NO_UPSTREAM=$(git branch -vv | grep -v \" \\[\" | sed \"s/^[\\* ] //\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
+		GONE=$(git branch -vv | grep \": gone]\" | sed \"s/^[\\*+ ] //\" | awk \"{print \\$1}\"); \
+		NO_UPSTREAM=$(git branch -vv | grep -v \" \\[\" | sed \"s/^[\\*+ ] //\" | awk \"{print \\$1}\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
 		TO_DELETE=$(printf \"%s\\n%s\\n\" \"$GONE\" \"$NO_UPSTREAM\" | grep -v \"^$\" | sort -u); \
 		if [ -n \"$WORKTREE_BRANCHES\" ]; then \
 			TO_DELETE=$(echo \"$TO_DELETE\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
@@ -199,8 +199,8 @@
 		DEFAULT=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d\"/\" -f4 2>/dev/null || echo \"main\"); \
 		CURRENT=$(git branch --show-current); \
 		WORKTREE_BRANCHES=$(git worktree list --porcelain 2>/dev/null | awk \"/^branch / {print \\$2}\" | sed \"s|^refs/heads/||\" | sort -u || true); \
-		GONE=$(git branch -vv | grep \": gone]\" | awk \"{print \\$1}\"); \
-		NO_UPSTREAM=$(git branch -vv | grep -v \" \\[\" | sed \"s/^[\\* ] //\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
+		GONE=$(git branch -vv | grep \": gone]\" | sed \"s/^[\\*+ ] //\" | awk \"{print \\$1}\"); \
+		NO_UPSTREAM=$(git branch -vv | grep -v \" \\[\" | sed \"s/^[\\*+ ] //\" | awk \"{print \\$1}\" | grep -v \"^$DEFAULT$\" | grep -v \"^$CURRENT$\" | grep -v \"^release/\"); \
 		TO_DELETE=$(printf \"%s\\n%s\\n\" \"$GONE\" \"$NO_UPSTREAM\" | grep -v \"^$\" | sort -u); \
 		if [ -n \"$WORKTREE_BRANCHES\" ]; then \
 			TO_DELETE=$(echo \"$TO_DELETE\" | grep -vxF \"$WORKTREE_BRANCHES\" || true); \
